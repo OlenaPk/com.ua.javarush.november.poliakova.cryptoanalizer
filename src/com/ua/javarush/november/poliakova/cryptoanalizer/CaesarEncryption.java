@@ -88,30 +88,42 @@ public class CaesarEncryption {
     }
 
     public static void encryptTextFromFileToFile(Path path, int shift) {
-        File file = new File(String.valueOf(path.getParent()), "EncryptedText.txt");
-        System.out.println("Path of encrypted file is: " + String.valueOf(file));
+        File file = new File(creatingPathForEncryptedFile(path));
         Path pathOfEncryptedFile = Path.of(String.valueOf(file));
-        try {
-            Path file1 = Files.createFile(pathOfEncryptedFile);
-        } catch (IOException e) {
-            System.out.println("Some problems with file creating");;
-        }
+                if (file.exists()) {
+            System.out.println("Encrypted File for " + String.valueOf(path.getFileName()) + " already exist");
 
-     try (Scanner scanner = new Scanner(path);
-          FileWriter writer = new FileWriter(String.valueOf(file))) {
-            { while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                writer.write(encryptTextFromString(line,shift));
-                writer.write("\n");
+        } else {
+            try {
+                Path file1 = Files.createFile(pathOfEncryptedFile);
+            } catch (IOException e) {
+                System.out.println("Some problems with file creating");
+                ;
+            }
+                    System.out.println("Path of encrypted file is: " + String.valueOf(file));
+            try (Scanner scanner = new Scanner(path);
+                 FileWriter writer = new FileWriter(String.valueOf(file))) {
+                {
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        writer.write(encryptTextFromString(line, shift));
+                        writer.write("\n");
+                    }
+                }
+
+            } catch (IOException e) {
+                System.out.println("Exception");
+                e.printStackTrace();
             }
         }
-
-    } catch (IOException e) {
-         System.out.println("Exception");
-         e.printStackTrace();
-            }
     }
+    public static String creatingPathForEncryptedFile(Path path){
+        String allPath = String.valueOf(path);
+        String[] words = allPath.split("\\.");
+        String newPath = words[0] + "EncryptedText.txt";
+        return newPath;
     }
+        }
 
 
 

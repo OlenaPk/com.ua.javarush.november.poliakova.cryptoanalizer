@@ -7,79 +7,80 @@ import java.util.Scanner;
 
 public class RootClass {
     static int choose = -1;
+    static boolean moreActions = true;
     public static void main(String[] args) throws InputMismatchException {
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("Hello!");
-        System.out.println("Please choose what do you want to do:");
-        System.out.println("Encrypt text by Caesar method - enter 1");
-        System.out.println("Decrypt encrypted by Caesar method text - enter 2");
-        System.out.println("Decrypt text by Brute Force method - enter 3");
-        System.out.println("Exit - enter 4");
+        while (moreActions) {
+            System.out.println("Please choose what do you want to do:");
+            System.out.println("Encrypt text by Caesar method - enter 1");
+            System.out.println("Decrypt encrypted by Caesar method text - enter 2");
+            System.out.println("Decrypt text by Brute Force method - enter 3");
+            System.out.println("Exit - enter 4");
 
-        switch (chooseInScanner(4)) {
-            case 1:
-                System.out.println("You have chosen encryption text by Caesar method");
-                System.out.println("Do you want encrypt text from: \n" +
-                        "file (enter 1)\n" +
-                        "console (enter 2)");
-                if (chooseInScanner(2) == 2)
-                {
-                    String tfc = textFromConsole();
-                    int shift = chooseShiftInAlphabet();
-                    if (tfc.isEmpty()) {
-                        System.out.println("You've entered nothing");
+            switch (chooseInScanner(4)) {
+                case 1:
+                    System.out.println("You have chosen encryption text by Caesar method");
+                    System.out.println("Do you want encrypt text from: \n" +
+                            "file (enter 1)\n" +
+                            "console (enter 2)");
+                    if (chooseInScanner(2) == 2) {
+                        String tfc = textFromConsole();
+                        int shift = chooseShiftInAlphabet();
+                        if (tfc.isEmpty()) {
+                            System.out.println("You've entered nothing");
+                        } else {
+                            System.out.println("was entered: \n" + tfc);
+                            System.out.println("encrypted text: ");
+                            System.out.println(CaesarEncryption.encryptTextFromString(tfc, shift));
+                        }
+                    } else {
+                        Path pathToFile = readPathToFileFromConsole();
+                        int shift = chooseShiftInAlphabet();
+                        CaesarEncryption.encryptTextFromFileToFile(pathToFile, shift); //need to print the path to new file
                     }
-                    else {
-                    System.out.println("was entered: \n" + tfc);
-                    System.out.println("encrypted text: ");
-                    System.out.println(CaesarEncryption.encryptTextFromString(tfc, shift));}
-                }
-                else {
-                    Path pathToFile = readPathToFileFromConsole();
-                    int shift = chooseShiftInAlphabet();
-                    CaesarEncryption.encryptTextFromFileToFile(pathToFile, shift); //need to print the path to new file
-                }
-
-                break;
-            case 2:
-                System.out.println("You have chosen decryption text by Caesar method");
-                System.out.println("Do you want encrypt text from: \n" +
-                        "file (enter 1)\n" +
-                        "console (enter 2)");
-                if (chooseInScanner(2) == 2)
-                {
-                    String tfc = textFromConsole();
-                    int shift = chooseShiftInAlphabet();
-                    if (tfc.isEmpty()) {
-                        System.out.println("You've entered nothing");
+                     moreActions = doMoreActions();
+                    break;
+                case 2:
+                    System.out.println("You have chosen decryption text by Caesar method");
+                    System.out.println("Do you want encrypt text from: \n" +
+                            "file (enter 1)\n" +
+                            "console (enter 2)");
+                    if (chooseInScanner(2) == 2) {
+                        String tfc = textFromConsole();
+                        int shift = chooseShiftInAlphabet();
+                        if (tfc.isEmpty()) {
+                            System.out.println("You've entered nothing");
+                        } else {
+                            System.out.println("was entered: \n" + tfc);
+                            System.out.println("encrypted text: ");
+                            System.out.println(CaesarDecryption.decryptTextFromString(tfc, shift));
+                        }
+                    } else {
+                        Path pathToFile = readPathToFileFromConsole();
+                        int shift = chooseShiftInAlphabet();
+                        CaesarDecryption.decryptTextFromFileToFile(pathToFile, shift);//need to print the path to new file
                     }
-                    else {
-                        System.out.println("was entered: \n" + tfc);
-                        System.out.println("encrypted text: ");
-                        System.out.println(CaesarDecryption.decryptTextFromString(tfc, shift));}
-                }
-                else {
+                    moreActions = doMoreActions();
+                    break;
+                case 3:
+                    System.out.println("You have chosen decryption text by Brute Force method");
                     Path pathToFile = readPathToFileFromConsole();
-                    int shift = chooseShiftInAlphabet();
-                    CaesarDecryption.decryptTextFromFileToFile(pathToFile, shift);//need to print the path to new file
-                }
-                //
-                break;
-            case 3:
-                System.out.println("You have chosen decryption text by Brute Force method");
-                Path pathToFile = readPathToFileFromConsole();
-                BruteForceDecription.decryptTextbyBruteForce(pathToFile);
-                //
-                break;
-            case 4:
-                System.out.println("Exit");
-                break;
+                    BruteForceDecription.decryptTextByBruteForce(pathToFile);
+                    moreActions = doMoreActions();
+                    break;
+                case 4:
+                    System.out.println("Exit");
+                    moreActions = false;
+                    break;
 
+
+
+            }
 
         }
-
     }
-
     public static int chooseInScanner(int options) {
         Scanner scanner = new Scanner(System.in);
                 try {
@@ -119,8 +120,6 @@ public class RootClass {
 
     public static Path readPathToFileFromConsole() {
         Scanner scanner = new Scanner(System.in);
-        /*System.out.println("Please enter path to file");
-        Path path = Path.of(scanner.nextLine());*/
         System.out.println("Please enter file path:");
         Path path = Path.of(scanner.nextLine());
         File file = new File(String.valueOf(path));
@@ -129,17 +128,30 @@ public class RootClass {
                     "Do you want to give another file?\n" +
                     "Yes - enter 1\n" +
                     "No - enter 2");
-            int answer = scanner.nextInt();
+            int answer = chooseInScanner(2);
             if (answer == 2) {
                 break;
             }
-            else {
-                path = Path.of(scanner.nextLine());
-
+            else if (answer == 1){
+                System.out.println("Please enter file path:");
+                Path path2 = Path.of(scanner.nextLine());
+                File file2 = new File(String.valueOf(path));
+                return path2;
             }
 
         }
         return path;
+    }
+    public static boolean doMoreActions () {
+        System.out.println("Do you want to perform one more action?\n" +
+                "Yes - enter 1\n" +
+                "No - enter 2");
+        int answer = chooseInScanner(2);
+        if (answer == 2) {
+            System.out.println("End");
+            return  false;}
+        else return true;
+
     }
 
 
